@@ -35,3 +35,6 @@ RUN set -e -x; \
 # which we often overshadow with a bind mount.
 #
 RUN cpm install --global --without-test
+
+ENTRYPOINT ["/app/json-to-mmdb"]
+USER user

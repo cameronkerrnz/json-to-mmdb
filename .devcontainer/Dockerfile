@@ -1,4 +1,4 @@
-FROM cameronkerrnz/jsontommdb:latest
+FROM cameronkerrnz/json-to-mmdb:latest
 
 # You might wonder why I didn't use the Dockerfile from the root of this
 # repo. Its only because that file is one of the prime outputs, whereas

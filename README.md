@@ -38,14 +38,19 @@ The creation of the MMDB format is necessarily tied to Perl; so this tool will t
 
 # Build the image
 
-This will create an image called jsontommdb:latest
+This will create an local image called json-to-mmdb:latest
+
+    docker build -t json-to-mmdb:latest .
+
+Most people should be able to just use cameronkerrnz/json-to-mmdb:latest
 
 # Using the image
 
 ## Creating your own
 
-    docker run -v ${PWD}:/work/ --rm jsontommdb:latest \
-      new /work/my-network.json /work/my-network.mmdb
+    docker run -v ${PWD}:/work/ --rm json-to-mmdb:latest \
+        --input=/work/my-network.json \
+        --output=/work/my-network.mmdb
 
 ## Extending GeoCity2-City etc.
 
