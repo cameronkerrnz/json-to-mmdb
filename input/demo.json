@@ -1,0 +1,55 @@
+{
+    "schema": {
+        "database_type": "demo-network",
+        "description": { "en": "Demo network allocations" },
+        "ip_version": 4,
+        "types": {
+            "vlan_id": "uint32",
+            "name": "utf8_string",
+            "campus": "utf8_string"
+        }
+    },
+    "allocations": [
+        {
+            "subnet": "10.10.0.0/16",
+            "name": "Datacenter range",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "10.10.0.0/20",
+            "vlan_id": 1,
+            "name": "Management interfaces",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "10.10.1.0/24",
+            "vlan_id": 123,
+            "name": "Load balancer VIPs",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "172.16.0.0/12",
+            "vlan_id": 234,
+            "name": "DMZ",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "10.64.0.0/23",
+            "vlan_id": 234,
+            "name": "VPN🐱‍💻",
+            "campus": "Remote"
+        },
+        {
+            "subnet": "10.64.128.0/23",
+            "vlan_id": 666,
+            "name": "Guest WiFi",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "10.64.129.0/24",
+            "vlan_id": 532,
+            "name": "Staff devices",
+            "campus": "Northern Branch Office"
+        }
+    ]
+}

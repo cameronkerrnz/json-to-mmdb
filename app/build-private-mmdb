@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+#
+# https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
+#
+use strict;
+use warnings;
+use feature qw( say );
+use Data::Dumper;
+use Getopt::Long;
+#
+# For reading the inputs
+#
+use JSON;
+#
+# For writing the output
+#
+use MaxMind::DB::Writer::Tree;
+
+my $input_filename;
+my $output_filename;
+
+GetOptions(
+  'input:s' => \$input_filename,
+  'output:s' => \$output_filename
+);
+
+die("Input file must be specified using --input=filename.json") unless defined($input_filename);
+die("Output file must be specified using --output=filename.mmdb") unless defined($output_filename);
+
+# Your top level data structure will always be a map (hash). The MMBD format
+# is strongly typed. The schema is provided in the JSON
+# See https://metacpan.org/pod/MaxMind::DB::Writer::Tree#DATA-TYPES
+
+my $input_json = do {
+  open( my $json_fh, "<:encoding(UTF-8)", $input_filename)
+      or die("Can't open \"$input_filename\": $!\n");
+  local $/;
+  <$json_fh>;
+};
+
+my $json = JSON->new;
+my $input_data = $json->decode($input_json);
+
+my $schema = $input_data->{'schema'};
+$schema->{'types'}{'subnet'} = 'utf8_string';
+
+# print Dumper($schema);
+
+my $tree = MaxMind::DB::Writer::Tree->new(
+  # "database_type" is some arbitrary string describing the database.
+  #
+  database_type => $schema->{'database_type'},
+
+  # "description" is a hashref where the keys are language names and
+  # the values are descriptions of the database in that language.
+  #
+  description => $schema->{'description'},
+
+  # "ip_version" can be either 4 or 6
+  #
+  ip_version => $schema->{'ip_version'},
+
+  # Add a callback to validate data going in to the database.
+  # Given a field name it returns the expected type.
+  #
+  map_key_type_callback => sub { $schema->{'types'}{ $_[0] } },
+
+  # "record_size" is the record size in bits. Either 24, 28 or 32
+  #
+  record_size => 24,
+
+  # We're dealing with reserved networks, so please don't silently
+  # ignore them when we do try to add them.
+  #
+  # Sure with the blog post mentioned this.
+  #
+  remove_reserved_networks => 0,
+);
+
+foreach my $alloc ( @{$input_data->{'allocations'}} ) {
+
+  # I think we want to keep the subnet in there, as I don't
+  # think we get it otherwise when we do the lookup.
+
+  $tree->insert_network($alloc->{'subnet'}, $alloc);
+}
+
+# Write the database to disk
+open my $output_fh, '>:raw', $output_filename;
+$tree->write_tree( $output_fh ) or die("Could not write MMDB file: $!");
+close $output_fh;

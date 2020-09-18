@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+###
+### This was experimental; current status unknown, but almost certainly will be broken
+###
+
+#
+# https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
+#
+use strict;
+use warnings;
+use feature qw( say );
+use Data::Dumper;
+#
+# For reading the inputs
+#
+use JSON;
+#
+# For writing the output
+#
+use MaxMind::DB::Writer::Tree;
+
+my $input_filename = '/cache/ip-allocations.json';
+my $output_filename = '/output/UO_GeoLite2_City.mmdb';
+
+# Your top level data structure will always be a map (hash). The MMBD format
+# is strongly typed. Describe your data types here.
+# See https://metacpan.org/pod/MaxMind::DB::Writer::Tree#DATA-TYPES
+
+# http://maxmind.github.io/MaxMind-DB/
+
+my %geolite2_city_types = (
+  ip => 'utf8_string',                 # {subnet}
+  city_name => 'utf8_string',          # {campus}
+  continent_code => 'utf8_string',     # "OC"
+  country_name => 'utf8_string',       # "New Zealand"
+  country_code2 => 'utf8_string',      # "NZ"
+  country_code3 => 'utf8_string',      # "NZL"
+  postal_code => 'utf8_string',        # {sgt_default_name}
+  dma_code => 'uint32',                # {sgt_default_number}
+  region_name => 'utf8_string',        # {vlan_desc}
+  region_code => 'utf8_string',        # {vlan_number}
+  timezone => 'utf8_string',           # 'Pacific/Auckland'
+  latitude => 'double',                # latitude of campus
+  longitude => 'double',               # longitude of campus
+);
+
+# my %types = (
+#   network => 'utf8_string',
+#   description => 'utf8_string',
+#   campus => 'utf8_string',
+#   vlan_desc => 'utf8_string',
+#   vlan_number => 'uint32'
+# );
+
+my $tree = MaxMind::DB::Writer::Tree->new(
+  # "database_type" is some arbitrary string describing the database.
+  #
+  database_type => 'GeoLite2-City',
+
+  # "description" is a hashref where the keys are language names and
+  # the values are descriptions of the database in that language.
+  #
+  description => { en => 'GeoLite2 City database + University of Otago Private Address Ranges' },
+
+  # "ip_version" can be either 4 or 6
+  #
+  # We don't yet care about IPv6 stuff, but I'm just trying to be just like
+  # a regular GeoCity2 schema. (hint: mmdblookup --verbose)
+  #
+  ip_version => 6,
+
+  # Add a callback to validate data going in to the database.
+  # Given a field name it returns the expected type.
+  #
+  map_key_type_callback => sub { $geolite2_city_types{ $_[0] } },
+
+  # "record_size" is the record size in bits. Either 24, 28 or 32
+  #
+  record_size => 28,
+
+  # We're dealing with reserved networks, so please don't silently
+  # ignore them when we do try to add them.
+  #
+  # Sure wish the blog post mentioned this.
+  #
+  remove_reserved_networks => 0,
+);
+
+my $input_json = do {
+  open( my $json_fh, "<:encoding(UTF-8)", $input_filename)
+      or die("Can't open \"$input_filename\": $!\n");
+  local $/;
+  <$json_fh>;
+};
+
+my $json = JSON->new;
+my $input_data = $json->decode($input_json);
+
+for( my $i = 0; $i < scalar @$input_data; $i++ ) {
+  # print Dumper($_);
+
+  # print Dumper($input_data->[$i]);
+
+  my $subnet = $input_data->[$i]->{'subnet'};
+
+  # $subnet_data{'description'}  = $input_data->[$i]->{'description'};
+
+  my %subnet_data = (
+    city_name =>          $input_data->[$i]->{'city_name'},
+    continent_code =>     'AA',
+    country_name =>       'INTERNAL',
+    country_code2 =>      'AA',
+    country_code3 =>      'AAA',
+    postal_code =>        $input_data->[$i]->{'sgt_default_name'},
+    dma_code =>           $input_data->[$i]->{'sgt_default_number'},
+    region_name =>        $input_data->[$i]->{'vlan_desc'},
+    region_code =>        $input_data->[$i]->{'vlan_number'},
+    timezone =>           'Pacific/Auckland',
+    latitude =>           $input_data->[$i]->{'latitude'},
+    longitude =>          $input_data->[$i]->{'longitude'}
+  );
+
+  my %subnet_data = (
+    continent => (
+      code => 'AA',
+      geoname_id => 6255151,
+      names => (en => 'INTERNAL')
+    ),
+    country => (
+      geoname_id => 2186224,
+      iso_code => 'AA',
+      names => (en => 'INTERNAL')
+    ),
+    location => (
+      accuracy_radius => 500,
+      latitude => $input_data->[$i]->{'latitude'},
+      longitude => $input_data->[$i]->{'longitude'},
+      timezone => 'Pacific/Auckland'
+    ),
+    city => (
+      names => (en => $input_data->[$i]->{'city_name'})
+    ),
+    postal => (
+      code => $input_data->[$i]->{'sgt_default_name'}
+    ),
+    region => (
+      names => (en => $input_data->[$i]->{'vlan_desc'}),
+      code => $input_data->[$i]->{'vlan_number'}
+    ),
+    dma => (
+      code => $input_data->[$i]->{'sgt_default_number'}
+    )
+  );
+
+  foreach my $k (keys %subnet_data) {
+    delete $subnet_data{$k} if not defined($subnet_data{$k});
+  }
+
+  $tree->insert_network($subnet, \%subnet_data);
+}
+
+# Write the database to disk
+open my $output_fh, '>:raw', $output_filename;
+$tree->write_tree( $output_fh );
+close $output_fh;
