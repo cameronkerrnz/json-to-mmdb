@@ -1,10 +1,8 @@
 The MaxMind DataBase (MMDB) format is very useful for storing
 information about IP ranges and quickly answering questions
 about the part of the network that IP belongs to.
-
 Classically, this is designed with a use-case of Global GeoIP
 services, which is the business MaxMind are involved in.
-
 But imagine other similar use-cases, where you want to get
 information about your own network, and want to know, given
 and IP, attributes such as VLAN ID or name, subnet, physical location, or special attributes such as:
@@ -15,11 +13,9 @@ and IP, attributes such as VLAN ID or name, subnet, physical location, or specia
 - whether this is a VPN, DMZ, Datacenter, Distribution, Access Layer, etc.
 - the mind wanders with possibilities.
 
-This effor build on top of the wonderful blog post that MaxMind made about creating your own (or supplementing theirs) MMDB files for GeoIP2.
+This effort builds on top of the wonderful blog post that MaxMind made about creating your own (or supplementing theirs) MMDB files for GeoIP2.
 
 https://blog.maxmind.com/2015/09/29/building-your-own-mmdb-database-for-fun-and-profit/
-
-In particular, the goal of this repository is to separate out the concerns of data-representation from the tooling needed to create the MMDB.
 
 There are many ways you might care to represent your IP address
 management data; it could be as simple (and useful) as a complex Excel spreadsheet, or a specialised IPAM tool.
