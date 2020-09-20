@@ -19,13 +19,14 @@ use MaxMind::DB::Writer::Tree;
 my $input_filename;
 my $output_filename;
 
+my $usage = "Usage: --input=file.json --output=file.mmdb\n";
 GetOptions(
   'input:s' => \$input_filename,
   'output:s' => \$output_filename
-);
+) or die($usage);
 
-die("Input file must be specified using --input=filename.json") unless defined($input_filename);
-die("Output file must be specified using --output=filename.mmdb") unless defined($output_filename);
+die("Input file must be specified using --input=filename.json\n") unless defined($input_filename);
+die("Output file must be specified using --output=filename.mmdb\n") unless defined($output_filename);
 
 # Your top level data structure will always be a map (hash). The MMBD format
 # is strongly typed. The schema is provided in the JSON

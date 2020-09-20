@@ -36,8 +36,7 @@
         {
             "subnet": "10.64.0.0/23",
             "vlan_id": 234,
-            "name": "VPN🐱‍💻",
-            "campus": "Remote"
+            "name": "Unicode NFKC Test (ﬃ)"
         },
         {
             "subnet": "10.64.128.0/23",
