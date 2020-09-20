@@ -59,6 +59,9 @@ COPY input/ /input/
 COPY output/ /output/
 COPY test/ /test/
 
+RUN \
+    chmod +x /app/json-to-mmdb
+
 RUN cd /; /test/libs/bats/bin/bats -r /test/spec/
 
 ENTRYPOINT ["/app/json-to-mmdb"]
