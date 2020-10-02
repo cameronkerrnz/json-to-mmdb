@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# MOTHBALLED: kept for future use, but not currently used
+
+# Requires MAXMIND_LICENCE_KEY to be defined in the environment
+
+MAXMIND_LICENCE_KEY=.......
+
+# set -x
+set -e
+set -u
+
+geolite2_city_csv_zip_url="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&license_key=${MAXMIND_LICENCE_KEY}&suffix=zip"
+geolite2_city_csv_zip_sha256_url="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&license_key=${MAXMIND_LICENCE_KEY}&suffix=zip.sha256"
+
+geolite2_city_csv_zip_url="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&license_key=${MAXMIND_LICENCE_KEY}&suffix=zip"
+geolite2_city_csv_zip_sha256_url="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&license_key=${MAXMIND_LICENCE_KEY}&suffix=zip.sha256"
+
+geolite2_city_mmdb_tgz_url="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${MAXMIND_LICENCE_KEY}&suffix=tar.gz"
+geolite2_city_mmdb_tgz_sha256_url="https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=${MAXMIND_LICENCE_KEY}&suffix=tar.gz.sha256"
+
+# Get the sha256
+# If different to what we have cached, then download the new file
+
+cd /cache
+
+curl -s "${geolite2_city_csv_zip_sha256_url}" > /cache/geolite2_city_csv.zip.sha256
+curl -s "${geolite2_city_mmdb_tgz_sha256_url}" > /cache/geolite2_city_mmdb.tar.gz.sha256
+
+function city_csv_checksums_okay() {
+    expected_sha256=$(awk 'NR==1 {print $1}' /cache/geolite2_city_csv.zip.sha256)
+    current_sha256=$(sha256sum /cache/geolite2_city_csv.zip | awk '{print $1}')
+
+    if [ "$expected_sha256" == "$current_sha256" ]; then
+        return 0 # true
+    else
+        return 1 # false
+    fi
+}
+
+function city_mmdb_checksums_okay() {
+    expected_sha256=$(awk 'NR==1 {print $1}' /cache/geolite2_city_mmdb.tar.gz.sha256)
+    current_sha256=$(sha256sum /cache/geolite2_city_mmdb.tar.gz | awk '{print $1}')
+
+    if [ "$expected_sha256" == "$current_sha256" ]; then
+        return 0 # true
+    else
+        return 1 # false
+    fi
+}
+
+function city_csv_download_required() {
+    if [ \! -r /cache/geolite2_city_csv.zip ]; then
+        return 0 # true
+    fi
+    expected_sha256=$(awk 'NR==1 {print $1}' /cache/geolite2_city_csv.zip.sha256)
+    current_sha256=$(sha256sum /cache/geolite2_city_csv.zip | awk '{print $1}')
+    if city_csv_checksums_okay; then
+        return 1 # false
+    fi
+    return 0 # true
+}
+
+function city_mmdb_download_required() {
+    if [ \! -r /cache/geolite2_city_mmdb.tar.gz ]; then
+        return 0 # true
+    fi
+    expected_sha256=$(awk 'NR==1 {print $1}' /cache/geolite2_city_mmdb.tar.gz.sha256)
+    current_sha256=$(sha256sum /cache/geolite2_city_mmdb.tar.gz | awk '{print $1}')
+    if city_mmdb_checksums_okay; then
+        return 1 # false
+    fi
+    return 0 # true
+}
+
+if city_csv_download_required; then
+    echo "Downloading City CSV database"
+    curl -s "${geolite2_city_csv_zip_url}" > /cache/geolite2_city_csv.zip
+fi
+
+if city_csv_checksums_okay; then
+    echo "Current CSV has been obtained"
+else
+    echo "Download for CSV does not match checksum"
+fi
+
+if city_mmdb_download_required; then
+    echo "Downloading City MMDB database"
+    curl -s "${geolite2_city_mmdb_tgz_url}" > /cache/geolite2_city_mmdb.tar.gz
+fi
+
+if city_mmdb_checksums_okay; then
+    echo "Current MMDB has been obtained"
+else
+    echo "Download for MMDB does not match checksum"
+fi
+
+echo "Unpacking CSV"
+rm -rf /cache/geolite2_city_csv \
+  && mkdir /cache/geolite2_city_csv \
+  && cd /cache \
+  && unzip -d /cache/geolite2_city_csv -j /cache/geolite2_city_csv.zip
+
+echo "Unpacking MMDB"
+rm -f /cache/GeoLite2-City.mmdb
+tar -C /cache --no-same-permissions --no-same-owner --strip-components=1 -xf /cache/geolite2_city_mmdb.tar.gz '*/GeoLite2-City.mmdb'
+
+
