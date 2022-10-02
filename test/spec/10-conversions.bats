@@ -43,3 +43,18 @@ load '../libs/bats-assert/load'
     run mmdblookup --file=output/demo.mmdb --ip=0.0.0.0 vlan_id
     assert_output --partial 'Could not find an entry for this IP address'
 }
+
+@test "Unicode BMP" {
+    run mmdblookup --file output/type_tests.mmdb --ip 0.0.2.2 a_utf8_string
+    assert_output --partial '"नमस्ते दुनिया!" <utf8_string>'
+}
+
+@test "Array of uint32" {
+    run mmdblookup --file output/type_tests.mmdb --ip 0.0.3.3 array_of_uint32 1
+    assert_output --partial ' 2130706433 <uint32>'
+}
+
+@test "Map of language to name of New Zealand" {
+    run mmdblookup --file output/type_tests.mmdb --ip 0.0.3.1 a_map mi
+    assert_output --partial '"Aotearoa" <utf8_string>'
+}
