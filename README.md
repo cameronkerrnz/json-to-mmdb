@@ -198,12 +198,13 @@ geoip lookup, and then perhaps try using a mmdb lookup.
 
 ## Build the image
 
-This will create an local image called json-to-mmdb:latest
+You will first require to have git submodules initialised to pull in the BATS unit-testing tool:
 
-    docker build -t json-to-mmdb:latest .
+    git submodule update --init --recursive
 
-Normally this should get built using a Docker Hub automated build, but
-doing yourself is perfectly fine too.
+Then build the container image
+
+    docker build -t cameronkerrnz/json-to-mmdb:latest .
 
 Most people should be able to just use cameronkerrnz/json-to-mmdb:latest,
 which should always be passing tests before getting tagged on Docker Hub.
