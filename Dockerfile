@@ -1,10 +1,8 @@
-FROM centos:8
+FROM registry.access.redhat.com/ubi8/ubi:latest
 CMD /bin/bash
 
 RUN useradd user
 WORKDIR /app
-
-RUN yum -y install epel-release
 
 RUN yum -y install \
   autoconf \
