@@ -171,6 +171,14 @@ to be either the GeoCity2 City or ASN database schema.
 
 logstash-filter-mmdb uses the https://github.com/maxmind/MaxMind-DB-Reader-java library.
 
+## IPv6 works too
+
+IPv6 also works; see the file input/ipv6-demo.json for starters:
+
+- You will need to set `ip_version` to 6 in the input file
+- You can use IPv4 subnets in the same IPv6 database
+- Querying should be careful regarding syntaxes such as %iface addresses. This is not a concern for MMDB generation, but can easily be an issue for the likes of log processing pipelines; not taking care of this could result in a lot of DNS lookups that would end up with 'Name of service not known'
+
 # (Not-a-Feature yet) Extending GeoCity2-City etc.
 
 MaxMind, as a response to Californian privacy laws, require

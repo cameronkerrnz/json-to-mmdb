@@ -52,5 +52,3 @@ load '../libs/bats-assert/load'
     run mmdblookup --file=output/ipv6-demo.mmdb --ip=2001:4860:4860::8844 name
     assert_output --partial 'Patter'
 }
-
-# should also test things like %iface suffixes
