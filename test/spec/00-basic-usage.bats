@@ -24,3 +24,7 @@ load '../libs/bats-assert/load'
     [ "$status" -eq 0 ]
 }
 
+@test "Basic conversion for IPv6 must work" {
+    run app/json-to-mmdb --input=input/ipv6-demo.json --output=output/ipv6-demo.mmdb
+    [ "$status" -eq 0 ]
+}

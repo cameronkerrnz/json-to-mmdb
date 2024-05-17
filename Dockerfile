@@ -33,7 +33,7 @@ RUN cpanm --notest App::cpm
 
 # MaxMind's libmaxminddb
 # https://github.com/maxmind/libmaxminddb/releases
-ARG libmaxminddb_version=1.7.1
+ARG libmaxminddb_version=1.9.1
 RUN set -e -x; \
   git clone --recursive https://github.com/maxmind/libmaxminddb; \
   cd libmaxminddb/; \
