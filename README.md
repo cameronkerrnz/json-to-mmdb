@@ -217,3 +217,12 @@ Then build the container image
 Most people should be able to just use cameronkerrnz/json-to-mmdb:latest,
 which should always be passing tests before getting tagged on Docker Hub.
 
+# Errors
+
+> Iteration is not currently allowed in trees with no nodes. Record type: **empty**
+
+This error is emitted when an empty allocations array are listed in the input.
+
+> Iteration is not currently allowed in trees with no nodes. Record type: **data**
+
+Seems to indicate that the input contains just a default (eg. "subnet": "::/0"). Adding at least one none /0 subnet should suffice.
