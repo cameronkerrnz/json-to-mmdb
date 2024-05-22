@@ -1,7 +1,5 @@
 # JSON to MMDB (MaxMind DataBase)
 
-![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/cameronkerrnz/json-to-mmdb) ![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/cameronkerrnz/json-to-mmdb) ![GitHub issues](https://img.shields.io/github/issues/cameronkerrnz/json-to-mmdb)
-
 The MaxMind DataBase (MMDB) format is very useful for storing
 information about IP ranges and quickly answering questions
 about the part of the network that IP belongs to.
