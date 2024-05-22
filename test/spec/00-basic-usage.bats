@@ -24,7 +24,19 @@ load '../libs/bats-assert/load'
     [ "$status" -eq 0 ]
 }
 
+@test "Converted file must be show evidence of default record size" {
+    run mmdb-dump-metadata --file=output/demo.mmdb
+    [ $status -eq 0 ]
+    assert_output --partial "record size:           24 bits"
+}
+
 @test "Basic conversion for IPv6 must work" {
     run app/json-to-mmdb --input=input/ipv6-demo.json --output=output/ipv6-demo.mmdb
     [ "$status" -eq 0 ]
+}
+
+@test "Converted file must be show evidence of IPv6" {
+    run mmdb-dump-metadata --file=output/ipv6-demo.mmdb
+    [ $status -eq 0 ]
+    assert_output --partial "IP version:            6"
 }

@@ -226,3 +226,7 @@ This error is emitted when an empty allocations array are listed in the input.
 > Iteration is not currently allowed in trees with no nodes. Record type: **data**
 
 Seems to indicate that the input contains just a default (eg. "subnet": "::/0"). Adding at least one none /0 subnet should suffice.
+
+> PerlIO_printf operation failed: Unknown error -1
+
+(unconfirmed) I can't reproduce this yet, but this error is generated in relation to record size. As of v0.0.4 this is now something you can specify in your schema definition, and will default to 24. See [record-size.json](./input/record-size.json) for an example, and some tests in [30-record-size.bats](./test/spec/30-record-size.bats).

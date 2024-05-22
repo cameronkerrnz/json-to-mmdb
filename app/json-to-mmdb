@@ -68,7 +68,7 @@ my $tree = MaxMind::DB::Writer::Tree->new(
 
   # "record_size" is the record size in bits. Either 24, 28 or 32
   #
-  record_size => 24,
+  record_size => $schema->{'record_size'} || 24,
 
   # We're dealing with reserved networks, so please don't silently
   # ignore them when we do try to add them.

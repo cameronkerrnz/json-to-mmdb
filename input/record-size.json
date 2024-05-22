@@ -1,0 +1,26 @@
+{
+    "schema": {
+        "database_type": "demo-network",
+        "description": { "en": "Demo network allocations" },
+        "ip_version": 4,
+        "record_size": 28,
+        "types": {
+            "vlan_id": "uint32",
+            "name": "utf8_string",
+            "campus": "utf8_string"
+        }
+    },
+    "allocations": [
+        {
+            "subnet": "10.10.0.0/16",
+            "name": "Datacenter range",
+            "campus": "Head Office"
+        },
+        {
+            "subnet": "172.16.0.0/12",
+            "vlan_id": 234,
+            "name": "DMZ",
+            "campus": "Head Office"
+        }
+    ]
+}
