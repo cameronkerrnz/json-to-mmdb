@@ -1,3 +1,9 @@
+# NOT ACTIVELY MAINTAINED
+
+I am not in a position to maintain this as frequently as I would have liked, and my logstash work required a lot of updating for Logstash 8, so I've made the decision to archive this project. It was last known to work with Logstash 7. Please look to Logstash's own version of this plugin (which this was forked from). 
+
+That said, this particular project isn't dependent on Logstash, so I'm still willing to maintain it to fix bugs.
+
 # JSON to MMDB (MaxMind DataBase)
 
 The MaxMind DataBase (MMDB) format is very useful for storing
